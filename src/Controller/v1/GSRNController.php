@@ -5,6 +5,7 @@ namespace App\Controller\v1;
 use App\Entity\GlobalServiceRelationNumber;
 use App\Repository\GlobalServiceRelationNumberRepository as GSRNRepo;
 use App\Repository\ProjectRepository;
+use App\Service\CheckDigitCalculator;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Service\ReferenceGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,6 +22,7 @@ final class GSRNController extends AbstractController
         Request $request,
         ProjectRepository $projectRepo,
         ReferenceGenerator $referenceGenerator,
+        CheckDigitCalculator $checkDigitCalculator,
         GSRNRepo $gsrnRepo,
         EntityManagerInterface $em
     ): JsonResponse
@@ -62,38 +64,47 @@ final class GSRNController extends AbstractController
             }
 
 
-            // Vérifier le format de la date de naissance
-            $birthdate = \DateTime::createFromFormat('d/m/Y', $data['birthdate']);
-            if (!$birthdate || $birthdate->format('d/m/Y') !== $data['birthdate']) {
-                return new JsonResponse(
-                    [
-                        'code'=> "1",
-                        'message' => 'Format de date de naissance invalide. Utilisez le format JJ/MM/AAAA.'
-                    ],
-                    Response::HTTP_BAD_REQUEST
-                );
-            }
+            
             
 
             // Génération du GSRN
             $lastGSRN = $gsrnRepo->findLatest();
+            
             $reference = $referenceGenerator->createNumericalReference(
                 $project->getCompanyPrefix(),
-                18,
+                17,
                 $lastGSRN?->getReference() ?? null
             );
 
-            
+            $checkDigit = $checkDigitCalculator->calculateCheckDigit($project->getCompanyPrefix() . $reference);
+            $fullGSRN = $project->getCompanyPrefix() . $reference . $checkDigit;
+
+            // dd($fullGSRN);
+
             $gsrn = new GlobalServiceRelationNumber();
             $gsrn->setFirstname($data['firstname']);
             $gsrn->setLastname($data['lastname']);
+            if (isset($data['middlename'])) {
+                $gsrn->setMiddlename($data['middlename']);
+            }
             $gsrn->setGender($data['gender']);
             $gsrn->setPhone($data['phone']);
-            $gsrn->setBirthdate(new \DateTime($data['birthdate']));
+            
+            // Gestion du format de date flexible
+            $birthdate = \DateTime::createFromFormat('d/m/Y', $data['birthdate']) 
+                ?? \DateTime::createFromFormat('Y-m-d', $data['birthdate'])
+                ?? new \DateTime($data['birthdate']);
+            
+            $gsrn->setBirthdate($birthdate);
             $gsrn->setTitle($data['title'] ?? null);
             $gsrn->setApplicationIdentifier("8018");
             $gsrn->setReference($reference);
-            $gsrn->setValue($project->getCompanyPrefix() . $reference);
+            $gsrn->setValue($fullGSRN);
+            $gsrn->setProject($project);
+
+            $em->persist($gsrn);
+            $em->flush();
+
 
             return new JsonResponse([
                 'code' => '0',
@@ -101,8 +112,8 @@ final class GSRNController extends AbstractController
                 'data' => [
                     "applicationIdentifier" => "8018",
                     "internalReference" => $reference,
-                    "gsrn" => $project->getCompanyPrefix() . $reference,
-                    "barcodeValue" => "(8018) " . $project->getCompanyPrefix() . $reference
+                    "gsrn" => $fullGSRN,
+                    "barcodeValue" => "(8018) " . $fullGSRN
                 ] 
             ], Response::HTTP_CREATED);
 

@@ -11,22 +11,17 @@ class CheckDigitCalculator
         $sum = 0;
         $length = strlen($input);
         
-        for ($i = 0; $i < $length; $i++) {
+        // Parcourir de droite à gauche selon l'algorithme GS1 standard
+        for ($i = $length - 1; $i >= 0; $i--) {
             $digit = (int)$input[$i];
-            // Even position (from the right) gets multiplied by 3 only if length is odd
+            $position = $length - $i; // Position depuis la droite (1, 2, 3...)
             
-            if ($length % 2 === 1) {
-                if (($length - $i) % 2 === 0) {
-                    $sum += $digit * 3;
-                } else {
-                    $sum += $digit;
-                }
+            if ($position % 2 === 1) {
+                // Position impaire depuis la droite: multiplier par 3
+                $sum += $digit * 3;
             } else {
-                if (($length - $i) % 2 === 0) {
-                    $sum += $digit;
-                } else {
-                    $sum += $digit * 3;
-                }
+                // Position paire depuis la droite: multiplier par 1
+                $sum += $digit * 1;
             }
         }
         

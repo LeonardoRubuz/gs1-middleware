@@ -17,8 +17,9 @@ class ReferenceGenerator
         $referenceLength = $expectedLength - strlen($prefix);
         
         if ($lastReference) {
-            // Retirer le préfixe et tous les "0" initiaux pour obtenir la partie numérique
-            $numericPart = ltrim(substr($lastReference, strlen($prefix)), '0');
+            // La lastReference est déjà la partie numérique sans préfixe
+            // Retirer tous les "0" initiaux pour obtenir la partie numérique
+            $numericPart = ltrim($lastReference, '0');
             // Si la partie numérique est vide (que des zéros), on commence à 1
             $nextNumber = $numericPart === '' ? 1 : (int)$numericPart + 1;
         } else {
