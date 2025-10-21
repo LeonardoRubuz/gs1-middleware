@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\EntityTrait;
 use App\Entity\Traits\IdentifierTrait;
 use App\Repository\GlobalDocumentTypeIdentifierRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -10,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 class GlobalDocumentTypeIdentifier
 {
 
+    use EntityTrait;
     use IdentifierTrait;
 
     #[ORM\Id]
@@ -21,10 +23,21 @@ class GlobalDocumentTypeIdentifier
     private ?string $documentName = null;
 
     #[ORM\Column(length: 17, nullable: true)]
-    private ?string $externalReference = null;
+    private ?string $reference = null;
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $type = null;
+
+
+    public function __construct()
+    {
+        
+        $this->code = uniqid();
+        $this->enabled = true;
+        $this->deleted = false;
+        $this->createdAt = new \DateTimeImmutable();
+        
+    }
 
     public function getId(): ?int
     {
@@ -43,14 +56,14 @@ class GlobalDocumentTypeIdentifier
         return $this;
     }
 
-    public function getExternalReference(): ?string
+    public function getReference(): ?string
     {
-        return $this->externalReference;
+        return $this->reference;
     }
 
-    public function setExternalReference(?string $externalReference): static
+    public function setReference(?string $reference): static
     {
-        $this->externalReference = $externalReference;
+        $this->reference = $reference;
 
         return $this;
     }

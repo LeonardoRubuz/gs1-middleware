@@ -7,22 +7,33 @@ use Doctrine\ORM\Mapping as ORM;
 
 trait IdentifierTrait 
 {
-    #[ORM\Column(type: 'string', length: 100, unique: true)]
-    private string $code;
     
     #[ORM\Column(type: 'string', length: 10)]
     private string $applicationIdentifier;
 
     #[ORM\Column(type: 'string', length: 500, nullable: true)]
     private ?string $value;
-    
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private ?\DateTimeInterface $createdAt;
-    
-    
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private ?\DateTimeInterface $updatedAt;
+
+    public function getApplicationIdentifier(): string
+    {
+        return $this->applicationIdentifier;
+    }
+
+    public function setApplicationIdentifier(string $applicationIdentifier): self
+    {
+        $this->applicationIdentifier = $applicationIdentifier;
+        return $this;
+    }
+
+    public function getValue(): ?string
+    {
+        return $this->value;
+    }
+
+    public function setValue(?string $value): self
+    {
+        $this->value = $value;
+        return $this;
+    }
 
 }

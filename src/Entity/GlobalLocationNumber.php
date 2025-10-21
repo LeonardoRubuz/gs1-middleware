@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\EntityTrait;
 use App\Entity\Traits\IdentifierTrait;
 use App\Repository\GlobalLocationNumberRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -9,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: GlobalLocationNumberRepository::class)]
 class GlobalLocationNumber
 {
+    use EntityTrait;
     use IdentifierTrait;
 
     #[ORM\Id]
@@ -24,6 +26,22 @@ class GlobalLocationNumber
     
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $locationAddress = null;
+
+    #[ORM\ManyToOne(inversedBy: 'glns')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Project $project = null;
+
+
+    public function __construct()
+    {
+        
+        $this->code = uniqid();
+        $this->enabled = true;
+        $this->deleted = false;
+        $this->createdAt = new \DateTimeImmutable();
+        
+    }
+
 
     public function getId(): ?int
     {
@@ -62,6 +80,18 @@ class GlobalLocationNumber
     public function setLocationAddress(?string $locationAddress): static
     {
         $this->locationAddress = $locationAddress;
+
+        return $this;
+    }
+
+    public function getProject(): ?Project
+    {
+        return $this->project;
+    }
+
+    public function setProject(?Project $project): static
+    {
+        $this->project = $project;
 
         return $this;
     }

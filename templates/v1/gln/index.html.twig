@@ -1,20 +1,152 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello GLNController!{% endblock %}
+{% block title %}{{ parent() }} DÃ©tail lead{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <ol class="breadcrumb bc-2">
+        <li>
+            <a href="{{ path('admin_dashboard') }}">
+                <i class="entypo-folder"></i>
+                Tableau de bord
+            </a>
+        </li>
+        <li><a href="{{ path('app_lead') }}">Leads</a></li>
+        <li class="active">{{ title }}</li>
+    </ol>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Lead - {{ title }} ({{ lead.username }}) </h3>
+        </div>
+        <div class="col-md-6">
+            {% if img != null %}
+                <img class="pull-left" width="80" src="{{ img }}"/>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Business</h3>
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <th>Code Marchand</th>
+                    <td>{{ lead.username }}</td>
+                </tr>
+                <tr>
+                    <th>Compte mobile</th>
+                    <td>{{ lead.mobileAccount }}</td>
+                </tr>
+                <tr>
+                    <th>Service demandÃ©</th>
+                    <td>
+                        {{ lead.services }}
+                        {% if lead.otherService %}
+                            <br> > {{ lead.otherService }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Document officiel</th>
+                    <td>
+                        {{ lead.rccm }}
+                        <a style="float: right" class="btn btn-icon btn-primary" target="_blank" href="https://webregister.flexpaie.com/file/{{ lead.rccmDocument|base64_encode }}">document<i class="fa fa-folder"></i></a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Site web / Url</th>
+                    <td>{{ lead.url }}</td>
+                </tr>
+                <tr>
+                    <th>Nom</th>
+                    <td>{{ lead.activity }}</td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>{{ lead.activityEmail }}</td>
+                </tr>
+                <tr>
+                    <th>Secteur</th>
+                    <td>{{ lead.field.name }}</td>
+                </tr>
+                <tr>
+                    <th>Telephone</th>
+                    <td>{{ lead.activityPhone1 }}</td>
+                </tr>
+                <tr>
+                    <th>Pays</th>
+                    <td> {{ lead.activityCountry.name }}</td>
+                </tr>
+                <tr>
+                    <th>Province / Etat</th>
+                    <td>{{ lead.activityProvince ? lead.activityProvince.name }}</td>
+                </tr>
+                <tr>
+                    <th>Statut</th>
+                    <td>
+                        {% if lead.deleted %}
+                            <span class="fa fa-check text-success"></span>
+                        {% else %}
+                            <span class="fa fa-times text-danger"></span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>CrÃ©ation</th>
+                    <td>{{ lead.createdAt ? lead.createdAt : '' }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h3>IdentitÃ© GÃ©rant</h3>
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <th>Nom</th>
+                    <td>{{ lead.lastname }}</td>
+                </tr>
+                <tr>
+                    <th>PrÃ©nom</th>
+                    <td>{{ lead.firstname }}</td>
+                </tr>
+                <tr>
+                    <th>Sexe</th>
+                    <td>{{ lead.gender }}</td>
+                </tr>
+                <tr>
+                    <th>TÃ©lÃ©phone</th>
+                    <td> {{ lead.phone1 }}</td>
+                </tr>
+                <tr>
+                    <th>IdentitÃ©</th>
+                    <td>
+                        <a style="float: right" class="btn btn-icon btn-primary" target="_blank" href="https://webregister.flexpaie.com/file/{{ lead.document|base64_encode }}">document<i class="fa fa-folder"></i></a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Résultat Shufti</th>
+                    <td>
+                        {% if lead.shuftiEvent %}
+                            <p>{{ lead.shuftiEvent }}</p>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Message Shufti</th>
+                    <td>
+                        {% if lead.shuftiReason %}
+                            <p>{{ lead.shuftiReason }}</p>
+                        {% endif %}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/rubuz.l/Documents/Infoset/Projets/gs1-middleware/src/Controller/v1/GLNController.php</code></li>
-        <li>Your template at <code>C:/Users/rubuz.l/Documents/Infoset/Projets/gs1-middleware/templates/v1/gln/index.html.twig</code></li>
-    </ul>
-</div>
+            {% if not lead.deleted and not lead.validate %}
+                <a onclick="return confirm('Valider ce lead?');" style="font-size: 0.8em" class="btn btn-sm btn-default btn-sm btn-icon icon-left" href="{{ path('lead_validate', {'id': lead.id}) }}"> <i style="color: green" class="fa fa-link"></i> valider</a>
+            {% endif %}
+        </div>
+    </div>
+
 {% endblock %}
