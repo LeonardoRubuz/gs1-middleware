@@ -28,6 +28,9 @@ class GlobalDocumentTypeIdentifier
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $type = null;
 
+    #[ORM\ManyToOne(targetEntity: Project::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Project $project = null;
 
     public function __construct()
     {
@@ -77,6 +80,19 @@ class GlobalDocumentTypeIdentifier
     public function setType(?string $type): static
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    
+    public function getProject(): ?Project
+    {
+        return $this->project;
+    }
+
+    public function setProject(?Project $project): static
+    {
+        $this->project = $project;
 
         return $this;
     }

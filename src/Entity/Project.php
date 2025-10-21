@@ -43,6 +43,11 @@ class Project
      */
     #[ORM\OneToMany(targetEntity: GlobalServiceRelationNumber::class, mappedBy: 'project', orphanRemoval: true)]
     private Collection $gsrns;
+    /**
+     * @var Collection<int, GlobalDocumentTypeIdentifier>
+     */
+    #[ORM\OneToMany(targetEntity: GlobalDocumentTypeIdentifier::class, mappedBy: 'project', orphanRemoval: true)]
+    private Collection $gdtis;
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $companyPrefix = null;
@@ -169,7 +174,38 @@ class Project
 
         return $this;
     }
+    
+    /**
+     * @return Collection<int, GlobalDocumentTypeIdentifier>
+     */
+    public function getGdtis(): Collection
+    {
+        return $this->gdtis;
+    }
 
+    public function addGdti(GlobalDocumentTypeIdentifier $gdti): static
+    {
+        if (!$this->gdtis->contains($gdti)) {
+            $this->gdtis->add($gdti);
+            $gdti->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGdti(GlobalDocumentTypeIdentifier $gdti): static
+    {
+        if ($this->gdtis->removeElement($gdti)) {
+            // set the owning side to null (unless already changed)
+            if ($gdti->getProject() === $this) {
+                $gdti->setProject(null);
+            }
+        }
+
+        return $this;
+    }
+
+    
     public function getCompanyPrefix(): ?string
     {
         return $this->companyPrefix;

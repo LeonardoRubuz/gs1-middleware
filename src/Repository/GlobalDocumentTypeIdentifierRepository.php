@@ -15,6 +15,17 @@ class GlobalDocumentTypeIdentifierRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, GlobalDocumentTypeIdentifier::class);
     }
+    public function findLatest($project): ?GlobalDocumentTypeIdentifier
+    {
+        return $this->createQueryBuilder('g')
+            ->andWhere('g.project = :project')
+            ->setParameter('project', $project)
+            ->orderBy('g.id', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+                ->getOneOrNullResult()
+            ;
+    }
 
     //    /**
     //     * @return GlobalDocumentTypeIdentifier[] Returns an array of GlobalDocumentTypeIdentifier objects

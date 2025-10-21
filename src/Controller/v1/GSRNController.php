@@ -68,7 +68,7 @@ final class GSRNController extends AbstractController
             
 
             // Génération du GSRN
-            $lastGSRN = $gsrnRepo->findLatest();
+            $lastGSRN = $gsrnRepo->findLatest($project);
             
             $reference = $referenceGenerator->createNumericalReference(
                 $project->getCompanyPrefix(),

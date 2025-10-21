@@ -99,10 +99,12 @@ final class ProjectController extends AbstractController
 
             return new JsonResponse([
                 'name' => $project->getName(),
+                'customer' => $project->getCustomer(),
                 'description' => $project->getDescription(),
                 'externalId' => $project->getExternalId(),
                 'datas' => [
                     'gln' => $project->getGlns()->count(),
+                    'gdti' => $project->getGdtis()->count(),
                     'gsrn' => $project->getGsrns()->count(),
                 ]
             ], Response::HTTP_OK);
