@@ -29,8 +29,7 @@ class Project
     #[ORM\Column(length: 255, nullable: false)]
     private ?string $customer = null;
 
-    #[ORM\Column()]
-    #[ORM\Column(type: 'uuid',length: 50, nullable: true, unique: true)]
+    #[ORM\Column(type: 'string', length: 50, nullable: true, unique: true)]
     private ?string $externalId = null;
 
     /**
@@ -38,6 +37,12 @@ class Project
      */
     #[ORM\OneToMany(targetEntity: GlobalLocationNumber::class, mappedBy: 'project', orphanRemoval: true)]
     private Collection $glns;
+    
+    /**
+     * @var Collection<int, GlobalServiceRelationNumber>
+     */
+    #[ORM\OneToMany(targetEntity: GlobalServiceRelationNumber::class, mappedBy: 'project', orphanRemoval: true)]
+    private Collection $gsrns;
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $companyPrefix = null;
@@ -129,6 +134,36 @@ class Project
             // set the owning side to null (unless already changed)
             if ($gln->getProject() === $this) {
                 $gln->setProject(null);
+            }
+        }
+
+        return $this;
+    }
+    
+    /**
+     * @return Collection<int, GlobalServiceRelationNumber>
+     */
+    public function getGsrns(): Collection
+    {
+        return $this->gsrns;
+    }
+
+    public function addGsrn(GlobalServiceRelationNumber $gsrn): static
+    {
+        if (!$this->gsrns->contains($gsrn)) {
+            $this->gsrns->add($gsrn);
+            $gsrn->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGsrn(GlobalServiceRelationNumber $gsrn): static
+    {
+        if ($this->gsrns->removeElement($gsrn)) {
+            // set the owning side to null (unless already changed)
+            if ($gsrn->getProject() === $this) {
+                $gsrn->setProject(null);
             }
         }
 

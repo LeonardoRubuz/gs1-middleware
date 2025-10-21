@@ -16,6 +16,16 @@ class GlobalServiceRelationNumberRepository extends ServiceEntityRepository
         parent::__construct($registry, GlobalServiceRelationNumber::class);
     }
 
+    public function findLatest(): ?GlobalServiceRelationNumber
+    {
+        return $this->createQueryBuilder('g')
+            ->orderBy('g.id', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+                ->getOneOrNullResult()
+            ;
+    }
+
     //    /**
     //     * @return GlobalServiceRelationNumber[] Returns an array of GlobalServiceRelationNumber objects
     //     */

@@ -23,7 +23,7 @@ class GlobalDocumentTypeIdentifier
     private ?string $documentName = null;
 
     #[ORM\Column(length: 17, nullable: true)]
-    private ?string $reference = null;
+    private ?string $externalReference = null;
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $type = null;
@@ -56,17 +56,18 @@ class GlobalDocumentTypeIdentifier
         return $this;
     }
 
-    public function getReference(): ?string
+    public function getExternalReference(): ?string
     {
-        return $this->reference;
+        return $this->externalReference;
     }
 
-    public function setReference(?string $reference): static
+    public function setExternalReference(?string $externalReference): static
     {
-        $this->reference = $reference;
+        $this->externalReference = $externalReference;
 
         return $this;
     }
+
 
     public function getType(): ?string
     {

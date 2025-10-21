@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Entity\Traits\EntityTrait;
 use App\Entity\Traits\IdentifierTrait;
 use App\Repository\GlobalServiceRelationNumberRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GlobalServiceRelationNumberRepository::class)]
@@ -24,12 +23,18 @@ class GlobalServiceRelationNumber
 
     #[ORM\Column(length: 255)]
     private ?string $lastname = null;
-    
-    #[ORM\Column(length: 25, nullable: true)]
+
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $middlename = null;
-    
-    #[ORM\Column(length: 15, nullable: false)]
+
+    #[ORM\Column(length: 10, nullable: true)]
     private ?string $gender = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $title = null;
+
+    #[ORM\Column(type: 'date', nullable: true)]
+    private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $phone = null;
@@ -37,10 +42,6 @@ class GlobalServiceRelationNumber
     #[ORM\ManyToOne(targetEntity: Project::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?Project $project = null;
-
-
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTime $birthdate = null;
 
     public function getId(): ?int
     {
@@ -71,30 +72,6 @@ class GlobalServiceRelationNumber
         return $this;
     }
 
-    public function getPhone(): ?string
-    {
-        return $this->phone;
-    }
-
-    public function setPhone(?string $phone): static
-    {
-        $this->phone = $phone;
-
-        return $this;
-    }
-
-    public function getProject(): ?Project
-    {
-        return $this->project;
-    }
-
-    public function setProject(?Project $project): static
-    {
-        $this->project = $project;
-
-        return $this;
-    }
-
     public function getMiddlename(): ?string
     {
         return $this->middlename;
@@ -119,14 +96,50 @@ class GlobalServiceRelationNumber
         return $this;
     }
 
-    public function getBirthdate(): ?\DateTime
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(?string $title): static
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getBirthdate(): ?\DateTimeInterface
     {
         return $this->birthdate;
     }
 
-    public function setBirthdate(?\DateTime $birthdate): static
+    public function setBirthdate(?\DateTimeInterface $birthdate): static
     {
         $this->birthdate = $birthdate;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): static
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getProject(): ?Project
+    {
+        return $this->project;
+    }
+
+    public function setProject(?Project $project): static
+    {
+        $this->project = $project;
 
         return $this;
     }

@@ -3,8 +3,10 @@
 namespace App\Controller\v1;
 
 use App\Entity\GlobalServiceRelationNumber;
+use App\Repository\GlobalServiceRelationNumberRepository as GSRNRepo;
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Service\ReferenceGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +20,8 @@ final class GSRNController extends AbstractController
     public function generateGSRN(
         Request $request,
         ProjectRepository $projectRepo,
+        ReferenceGenerator $referenceGenerator,
+        GSRNRepo $gsrnRepo,
         EntityManagerInterface $em
     ): JsonResponse
     {
@@ -37,7 +41,7 @@ final class GSRNController extends AbstractController
             }
 
             // Vérification des champs obligatoires
-            $required = ['firstname', 'lastname', 'gender', 'phone', 'birthdate', 'projectExternalId', 'reference'];
+            $required = ['firstname', 'lastname', 'gender', 'phone', 'birthdate', 'projectExternalId'];
             foreach ($required as $field) {
                 if (empty($data[$field])) {
                     return new JsonResponse(['error' => "Le champ '$field' est obligatoire"], Response::HTTP_BAD_REQUEST);
@@ -46,6 +50,7 @@ final class GSRNController extends AbstractController
 
             // Vérification de l'existence du projet
             $project = $projectRepo->findOneBy(['externalId' => $data['projectExternalId']]);
+            
             if (!$project) {
                 return new JsonResponse(
                     [
@@ -68,18 +73,16 @@ final class GSRNController extends AbstractController
                     Response::HTTP_BAD_REQUEST
                 );
             }
-            // Vérifier la taille de la référence
-            if (strlen($data['reference']) > 17) {
-                return new JsonResponse(
-                    [
-                        'code'=> "1",
-                        'message' => 'La référence ne doit pas dépasser 17 caractères.'
-                    ],
-                    Response::HTTP_BAD_REQUEST
-                );
-            }
+            
 
             // Génération du GSRN
+            $lastGSRN = $gsrnRepo->findLatest();
+            $reference = $referenceGenerator->createNumericalReference(
+                $project->getCompanyPrefix(),
+                18,
+                $lastGSRN?->getReference() ?? null
+            );
+
             
             $gsrn = new GlobalServiceRelationNumber();
             $gsrn->setFirstname($data['firstname']);
@@ -87,15 +90,19 @@ final class GSRNController extends AbstractController
             $gsrn->setGender($data['gender']);
             $gsrn->setPhone($data['phone']);
             $gsrn->setBirthdate(new \DateTime($data['birthdate']));
+            $gsrn->setTitle($data['title'] ?? null);
+            $gsrn->setApplicationIdentifier("8018");
+            $gsrn->setReference($reference);
+            $gsrn->setValue($project->getCompanyPrefix() . $reference);
 
             return new JsonResponse([
                 'code' => '0',
                 'message' => 'GSRN généré avec succès',
                 'data' => [
-                    "applicationIdentifier" => "414",
-                    "internalReference" => "",
-                    "gsrn" => "",
-                    "barcodeValue" => "(414) 1234567890123"
+                    "applicationIdentifier" => "8018",
+                    "internalReference" => $reference,
+                    "gsrn" => $project->getCompanyPrefix() . $reference,
+                    "barcodeValue" => "(8018) " . $project->getCompanyPrefix() . $reference
                 ] 
             ], Response::HTTP_CREATED);
 

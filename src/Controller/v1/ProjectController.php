@@ -57,6 +57,7 @@ final class ProjectController extends AbstractController
             $project = new Project();
             $project->setName($data['name']);
             $project->setCustomer($data['customer']);
+            $project->setCompanyPrefix($data['companyPrefix']);
             if (isset($data['description'])) {
                 $project->setDescription($data['description']);
             }
@@ -102,7 +103,7 @@ final class ProjectController extends AbstractController
                 'externalId' => $project->getExternalId(),
                 'datas' => [
                     'gln' => $project->getGlns()->count(),
-                    'gdti' => $project->getGdtis()->count(),
+                    'gsrn' => $project->getGsrns()->count(),
                 ]
             ], Response::HTTP_OK);
 

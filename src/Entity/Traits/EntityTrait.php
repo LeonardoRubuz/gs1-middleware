@@ -17,12 +17,10 @@ trait EntityTrait
     private bool $deleted;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?\DateTimeInterface $createdAt;
     
     
     #[ORM\Column(type: 'datetime', nullable: true)]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?\DateTimeInterface $updatedAt;
 
     public function getCode(): string
