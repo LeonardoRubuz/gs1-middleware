@@ -16,6 +16,18 @@ class GlobalLocationNumberRepository extends ServiceEntityRepository
         parent::__construct($registry, GlobalLocationNumber::class);
     }
 
+    public function findLatest($project): ?GlobalLocationNumber
+    {
+        return $this->createQueryBuilder('g')
+            ->andWhere('g.project = :project')
+            ->setParameter('project', $project)
+            ->orderBy('g.id', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+                ->getOneOrNullResult()
+            ;
+    }
+
     //    /**
     //     * @return GlobalLocationNumber[] Returns an array of GlobalLocationNumber objects
     //     */
