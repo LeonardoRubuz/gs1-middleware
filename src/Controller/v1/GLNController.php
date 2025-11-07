@@ -87,6 +87,8 @@ final class GLNController extends AbstractController
             $gln->setReference($reference);
             $gln->setValue($fullGLN);
             $gln->setProject($project);
+            $em->persist($gln);
+            $em->flush();
             
             return new JsonResponse([
                 'code' => '0',
