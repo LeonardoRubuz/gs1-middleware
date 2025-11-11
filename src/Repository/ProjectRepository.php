@@ -16,6 +16,20 @@ class ProjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Project::class);
     }
 
+        /**
+         * @return Project Returns a Project object
+         */
+        public function findByExternalIdOrGCP($value): ?Project
+        {
+            return $this->createQueryBuilder('p')
+                ->andWhere('p.externalId = :val OR p.companyPrefix = :val')
+                ->setParameter('val', $value)
+                ->getQuery()
+                ->getOneOrNullResult()
+            ;
+        }
+
+
     //    /**
     //     * @return Project[] Returns an array of Project objects
     //     */
