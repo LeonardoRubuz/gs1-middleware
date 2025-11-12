@@ -51,7 +51,7 @@ final class GSRNController extends AbstractController
             }
 
             // Vérification de l'existence du projet
-            $project = $projectRepo->findOneBy(['externalId' => $data['projectExternalId']]);
+            $project = $projectRepo->findByExternalIdOrGCP($data['projectExternalId']);
             
             if (!$project) {
                 return new JsonResponse(
