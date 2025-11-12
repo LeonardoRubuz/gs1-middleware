@@ -43,7 +43,7 @@ final class GLNController extends AbstractController
             }
 
             // Vérification des champs obligatoires
-            $required = ['locationName', 'locationAddress', 'projectExternalId'];
+            $required = ['locationName',  'projectExternalId'];
             foreach ($required as $field) {
                 if (empty($data[$field])) {
                     return new JsonResponse(['error' => "Le champ '$field' est obligatoire"], Response::HTTP_BAD_REQUEST);
