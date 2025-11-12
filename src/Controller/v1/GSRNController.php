@@ -43,7 +43,7 @@ final class GSRNController extends AbstractController
             }
 
             // Vérification des champs obligatoires
-            $required = ['firstname', 'lastname', 'gender', 'phone', 'birthdate', 'projectExternalId'];
+            $required = ['firstname', 'lastname', 'gender', 'phone', 'projectExternalId'];
             foreach ($required as $field) {
                 if (empty($data[$field])) {
                     return new JsonResponse(['error' => "Le champ '$field' est obligatoire"], Response::HTTP_BAD_REQUEST);
@@ -91,11 +91,11 @@ final class GSRNController extends AbstractController
             $gsrn->setPhone($data['phone']);
             
             // Gestion du format de date flexible
-            $birthdate = \DateTime::createFromFormat('d/m/Y', $data['birthdate']) 
+            /* $birthdate = \DateTime::createFromFormat('d/m/Y', $data['birthdate']) 
                 ?? \DateTime::createFromFormat('Y-m-d', $data['birthdate'])
-                ?? new \DateTime($data['birthdate']);
+                ?? new \DateTime($data['birthdate']); */
             
-            $gsrn->setBirthdate($birthdate);
+            $gsrn->setBirthdate(null);
             $gsrn->setTitle($data['title'] ?? null);
             $gsrn->setApplicationIdentifier("8018");
             $gsrn->setReference($reference);
