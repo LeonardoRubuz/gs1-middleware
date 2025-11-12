@@ -79,7 +79,7 @@ final class GLNController extends AbstractController
             $gln = new GlobalLocationNumber();
             $gln->setApplicationIdentifier('414');
             $gln->setLocationName($data['locationName']);
-            $gln->setLocationAddress($data['locationAddress']);
+            $gln->setLocationAddress(null);
             if (isset($data['gpsLocation'])) {
                 
                 $gln->setGps($data['gpsLocation']);
