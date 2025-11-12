@@ -6,6 +6,7 @@ use App\Entity\GlobalDocumentTypeIdentifier;
 use App\Repository\GlobalDocumentTypeIdentifierRepository as GDTIRepo;
 use App\Repository\ProjectRepository;
 use App\Service\CheckDigitCalculator;
+use App\Service\ExternalReferenceGenerator;
 use App\Service\ReferenceGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,6 +25,7 @@ final class GDTIController extends AbstractController
         ReferenceGenerator $referenceGenerator,
         CheckDigitCalculator $checkDigitCalculator,
         GDTIRepo $gdtiRepo,
+        ExternalReferenceGenerator $extRef,
         EntityManagerInterface $em
     ): JsonResponse
     {
@@ -43,26 +45,34 @@ final class GDTIController extends AbstractController
             }
 
             // Vérification des champs obligatoires
-            $required = ['documentName', 'externalReference', 'projectExternalId'];
+            $required = ['documentName',  'projectExternalId'];
             foreach ($required as $field) {
                 if (empty($data[$field])) {
                     return new JsonResponse(['error' => "Le champ '$field' est obligatoire"], Response::HTTP_BAD_REQUEST);
                 }
             }
 
-            if (isset($data["externalReference"]) && strlen($data['externalReference']) > 17) {
-                
-                return new JsonResponse(
-                    [
-                        'code'=> "1",
-                        'message' => 'La référence externe ne peut pas dépasser 17 caractères'
-                    ],
-                    Response::HTTP_BAD_REQUEST
-                );
+            $externalRef = '';
+
+            if (isset($data["externalReference"]) && !empty($data['externalReference'])) {
+                if (strlen($data['externalReference']) > 17) {
+                    return new JsonResponse(
+                        [
+                            'code'=> "1",
+                            'message' => 'La référence externe ne peut pas dépasser 17 caractères'
+                        ],
+                        Response::HTTP_BAD_REQUEST
+                    );
+                }
+                $externalRef = $data['externalReference'];
+            } else {
+                $externalRef = $extRef->createGDTIRef($gdtiRepo);
             }
 
+            //dd($externalRef);
+
             // Vérification de l'existence du projet
-            $project = $projectRepo->findOneBy(['externalId' => $data['projectExternalId']]);
+            $project = $projectRepo->findByExternalIdOrGCP($data['projectExternalId']);
             
             if (!$project) {
                 return new JsonResponse(
@@ -87,15 +97,15 @@ final class GDTIController extends AbstractController
                 $project->getCompanyPrefix() . $reference
             );
 
-            $fullGDTI = $project->getCompanyPrefix() . $reference  . $checkDigit . $data['externalReference'];
+            $fullGDTI = $project->getCompanyPrefix() . $reference  . $checkDigit . $externalRef;
             
-            //dd($fullGDTI);
+            // dd($fullGDTI);
 
             $gdti = new GlobalDocumentTypeIdentifier();
             $gdti->setDocumentName($data['documentName']);
             $gdti->setApplicationIdentifier('253');
-            $gdti->setExternalReference($data['externalReference']);
-            $gdti->setType($data['type']);
+            $gdti->setExternalReference($externalRef);
+            $gdti->setType($data['type'] ?? null);
             $gdti->setReference($reference);
             $gdti->setValue($fullGDTI);
             $gdti->setProject($project);
