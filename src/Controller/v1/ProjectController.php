@@ -88,7 +88,7 @@ final class ProjectController extends AbstractController
     ): JsonResponse
     {
         try {
-            $project = $repo->findOneBy(['externalId' => $projectExternalId]);
+            $project = $repo->findByExternalIdOrGCP($projectExternalId);
 
             if (!$project) {
                 return new JsonResponse([
