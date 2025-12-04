@@ -52,6 +52,12 @@ class Project
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $companyPrefix = null;
 
+    /**
+     * @var Collection<int, GlobalTradeItemNumber>
+     */
+    #[ORM\OneToMany(targetEntity: GlobalTradeItemNumber::class, mappedBy: 'project')]
+    private Collection $globalTradeItemNumbers;
+
     public function __construct()
     {
         $this->glns = new ArrayCollection();
@@ -60,6 +66,7 @@ class Project
         $this->enabled = true;
         $this->deleted = false;
         $this->createdAt = new \DateTimeImmutable();
+        $this->globalTradeItemNumbers = new ArrayCollection();
         
     }
 
@@ -214,6 +221,36 @@ class Project
     public function setCompanyPrefix(?string $companyPrefix): static
     {
         $this->companyPrefix = $companyPrefix;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GlobalTradeItemNumber>
+     */
+    public function getGlobalTradeItemNumbers(): Collection
+    {
+        return $this->globalTradeItemNumbers;
+    }
+
+    public function addGlobalTradeItemNumber(GlobalTradeItemNumber $globalTradeItemNumber): static
+    {
+        if (!$this->globalTradeItemNumbers->contains($globalTradeItemNumber)) {
+            $this->globalTradeItemNumbers->add($globalTradeItemNumber);
+            $globalTradeItemNumber->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGlobalTradeItemNumber(GlobalTradeItemNumber $globalTradeItemNumber): static
+    {
+        if ($this->globalTradeItemNumbers->removeElement($globalTradeItemNumber)) {
+            // set the owning side to null (unless already changed)
+            if ($globalTradeItemNumber->getProject() === $this) {
+                $globalTradeItemNumber->setProject(null);
+            }
+        }
 
         return $this;
     }
